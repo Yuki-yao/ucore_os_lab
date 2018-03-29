@@ -9,7 +9,7 @@
    usually split, and the remainder added to the list as another free block.
    Please see Page 196~198, Section 8.2 of Yan Wei Min's chinese book "Data Structure -- C programming language"
 */
-// LAB2 EXERCISE 1: YOUR CODE
+// LAB2 EXERCISE 1: 2015011351
 // you should rewrite functions: default_init,default_init_memmap,default_alloc_pages, default_free_pages.
 /*
  * Details of FFMA
@@ -89,13 +89,9 @@ default_alloc_pages(size_t n) {
     }
     struct Page *page = NULL;
     list_entry_t *le = &free_list;
-    int count = 0;
     while ((le = list_next(le)) != &free_list) {
         page = le2page(le, page_link);
-        if(count < 5)
-        	cprintf("%08x\n", le);
-        count ++;
-        	cprintf("YES!\n");
+        if(page->property >= n) {
 			struct Page* p = page;
 			struct Page* p_next = NULL;
 			for(int i = 0; i < n; i ++) {
@@ -110,8 +106,6 @@ default_alloc_pages(size_t n) {
 			}
 			page->property = n;
 		    nr_free -= n;
-		    //cprintf("page_addr=%08x, page->property=%d\n", (page->page_link), page->property);
-		    //cprintf("next_page_addr=%08x, page->property=%d\n", (page->page_link), p->property);
         	return page;
         }
     }
@@ -129,12 +123,12 @@ default_free_pages(struct Page *base, size_t n) {
     }
     // now reset and insert all free pages before le
     for(int i = 0; i < n; i ++) {
-    	struct Page* p = base + n;
+    	struct Page* p = base + i;
         p->flags = p->property = 0;
         ClearPageReserved(p);
         SetPageProperty(p);
         set_page_ref(p, 0);
-    	list_add_before(le, &((base+n)->page_link));
+    	list_add_before(le, &((base+i)->page_link));
     }
     base->property = n;
 
@@ -155,10 +149,8 @@ default_free_pages(struct Page *base, size_t n) {
 			if(le == &free_list)
 				break;
 		}
-		if(le != &free_list) {
-			base_prev->property += base->property;
-			base->property = 0;
-		}
+		base_prev->property += base->property;
+		base->property = 0;
 	}
     nr_free += n;
 }
