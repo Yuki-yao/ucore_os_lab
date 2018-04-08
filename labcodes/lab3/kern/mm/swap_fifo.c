@@ -68,11 +68,61 @@ _fifo_swap_out_victim(struct mm_struct *mm, struct Page ** ptr_page, int in_tick
      /*LAB3 EXERCISE 2: 2015011351*/ 
      //(1)  unlink the  earliest arrival page in front of pra_list_head qeueue
      //(2)  set the addr of addr of this page to ptr_page
+
+     /* fifo alg */
+     /*
      list_entry_t* victim_le = list_prev(head);
      struct Page* victim_page = le2page(victim_le, pra_page_link);
      list_del(victim_le);
      *ptr_page = victim_page;
-     return 0;
+     */
+
+    /* enhanced clock alg */
+    list_entry_t* le = list_prev(head);
+    struct Page* page;
+    while(le != head) {
+        page = le2page(le, pra_page_link);
+        pte_t* ptep = get_pte(mm->pgdir, page->pra_vaddr, 0);  // don't need to create new page table
+        assert(ptep != NULL);
+        if(!(*ptep & PTE_A) && !(*ptep & PTE_D)) {  // not accessed and not dirty (aka (0, 0))
+            list_del(le);
+            *ptr_page = page;
+            return 0;
+        }
+        le = list_prev(le);
+    }
+
+    le = list_prev(head);
+    while(le != head) {
+        page = le2page(le, pra_page_link);
+        pte_t* ptep = get_pte(mm->pgdir, page->pra_vaddr, 0);
+        assert(ptep != NULL);
+        if(!(*ptep & PTE_A) && (*ptep & PTE_D)) {  // (0, 1)
+            list_del(le);
+            *ptr_page = page;
+            return 0;
+        }
+        le = list_prev(le);
+    }
+
+    le = list_prev(head);
+    while(le != head) {
+        page = le2page(le, pra_page_link);
+        pte_t* ptep = get_pte(mm->pgdir, page->pra_vaddr, 0);
+        assert(ptep != NULL);
+        if(!(*ptep & PTE_D)) {  // (1, 0)
+            list_del(le);
+            *ptr_page = page;
+            return 0;
+        }
+        le = list_prev(le);
+    }
+
+    le = list_prev(head);
+    page = le2page(le, pra_page_link);
+    list_del(le);
+    *ptr_page = page;
+    return 0;
 }
 
 static int

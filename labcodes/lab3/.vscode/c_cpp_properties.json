@@ -61,7 +61,13 @@
             "name": "Win32",
             "includePath": [
                 "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
-                "${workspaceFolder}"
+                "${workspaceFolder}",
+                "${workspaceFolder}/libs",
+                "${workspaceFolder}/kern/mm",
+                "${workspaceFolder}/kern/debug",
+                "${workspaceFolder}/kern/sync",
+                "${workspaceFolder}/kern/driver",
+                "${workspaceFolder}/kern/fs"
             ],
             "defines": [
                 "_DEBUG",
@@ -76,7 +82,9 @@
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
-            }
+            },
+            "cStandard": "c11",
+            "cppStandard": "c++17"
         }
     ],
     "version": 3
