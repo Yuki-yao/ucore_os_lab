@@ -41,7 +41,8 @@
                 "${workspaceFolder}/libs",
                 "${workspaceFolder}/kern/trap",
                 "${workspaceFolder}/kern/sync",
-                "${workspaceFolder}/kern/driver"
+                "${workspaceFolder}/kern/driver",
+                "${workspaceFolder}/user/libs"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",
